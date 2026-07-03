@@ -286,3 +286,4 @@ mvn test
 1. **JWT Lockouts**: Enter bad password 5 times on `/login`. Verify "Account Locked" response.
 2. **State GST Detection**: Register customer from "Tamil Nadu" and run POS checkout on products. Verify the invoice charges **IGST** (instead of local CGST/SGST split).
 3. **Redemption Safety**: Redeem rewards points on small invoice. Confirm points deduction is capped at 20% of taxable value.
+# GST-compilance-calculation
