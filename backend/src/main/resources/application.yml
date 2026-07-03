@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: smartretail360
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/smartretail360}
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  mail:
+    host: ${SPRING_MAIL_HOST:smtp.mailtrap.io}
+    port: ${SPRING_MAIL_PORT:2525}
+    username: ${SPRING_MAIL_USERNAME:mock-username}
+    password: ${SPRING_MAIL_PASSWORD:mock-password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# JWT Configuration
+app:
+  jwt:
+    secret: ${APP_JWT_SECRET:9a6Z9pqwE4Y3n1zV6uL8kX2mO9jR7xQ1vD5sC8bN4aM3hK5fG6tY8uI2oP0sT1yR5wB3n8vM0kL2}
+    expiration-ms: ${APP_JWT_EXPIRATION_MS:86400000} # 24 hours
+    refresh-expiration-ms: 604800000 # 7 days
+  upload:
+    dir: ./uploads
+  store:
+    state: ${APP_STORE_STATE:Karnataka} # Default state of the billing store for GST CGST/SGST vs IGST detection
+    name: ${APP_STORE_NAME:SmartRetail 360 flagship}
+    gstin: ${APP_STORE_GSTIN:29AAAAA1111A1Z1}

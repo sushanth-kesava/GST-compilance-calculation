@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: smartretail-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  redis:
+    image: redis:7-alpine
+    container_name: smartretail-cache
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: ./backend
+    container_name: smartretail-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/smartretail360
+      - APP_STORE_STATE=Karnataka
+    depends_on:
+      - mongodb
+      - redis
+    restart: always
+
+  frontend:
+    build: ./frontend
+    container_name: smartretail-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  mongo-data:

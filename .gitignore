@@ -1,0 +1,35 @@
+# Environment settings (contains passwords, keys, and credentials)
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Maven build output
+**/target/
+*.jar
+*.war
+*.ear
+
+# Node dependencies and build outputs
+**/node_modules/
+**/dist/
+.oxlint/
+
+# IDE settings
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.settings/
+.project
+.classpath
+.factorypath
