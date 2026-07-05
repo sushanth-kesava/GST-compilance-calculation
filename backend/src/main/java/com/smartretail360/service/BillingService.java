@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -32,6 +33,9 @@ public class BillingService {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @Value("${app.store.state}")
     private String storeState;
@@ -313,6 +317,20 @@ public class BillingService {
 
         // Send payment alert notification
         notificationService.sendPaymentAlert(savedInvoice);
+
+        // Broadcast real-time update via WebSocket
+        try {
+            simpMessagingTemplate.convertAndSend("/topic/invoices", savedInvoice);
+            simpMessagingTemplate.convertAndSend("/topic/notifications", 
+                    Map.of("type", "NEW_INVOICE", 
+                           "invoiceNumber", savedInvoice.getInvoiceNumber(),
+                           "customerName", savedInvoice.getCustomerName(),
+                           "finalAmount", savedInvoice.getFinalAmount(),
+                           "timestamp", Instant.now().toString()));
+        } catch (Exception e) {
+            // WebSocket broadcast failure should not break billing flow
+            System.err.println("WebSocket broadcast failed: " + e.getMessage());
+        }
 
         return savedInvoice;
     }

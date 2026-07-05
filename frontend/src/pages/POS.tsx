@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import React, { useState, useEffect, useRef } from 'react';
+import api, { API_BASE_URL } from '../services/api';
 import { 
   Search, Trash2, Receipt, 
-  Sparkles, FolderDown, Inbox 
+  Sparkles, FolderDown, Inbox, Barcode, Mail, Printer,
+  QrCode, Download
 } from 'lucide-react';
+import { useToast } from '../components/Toast';
 
 interface CartItem {
   id: string;
@@ -32,6 +34,11 @@ const POS: React.FC = () => {
   
   // Hold invoice storage
   const [holdInvoices, setHoldInvoices] = useState<any[]>([]);
+  
+  // Barcode scanner ref
+  const barcodeInputRef = useRef<HTMLInputElement>(null);
+  const [barcodeMode, setBarcodeMode] = useState(false);
+  const [barcodeValue, setBarcodeValue] = useState('');
 
   // Customer states
   const [customerPhone, setCustomerPhone] = useState('');
@@ -52,8 +59,10 @@ const POS: React.FC = () => {
   const [receiptInvoice, setReceiptInvoice] = useState<any | null>(null);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
 
-  // Store profile default
-  const storeState = 'Karnataka';
+  const { toast } = useToast();
+
+  // Store profile default from env or fallback
+  const storeState = import.meta.env.VITE_STORE_STATE || 'Karnataka';
 
   // Find Products
   const searchProducts = async (term: string) => {
@@ -67,7 +76,7 @@ const POS: React.FC = () => {
         setSearchResults(res.data);
       }
     } catch (err) {
-      console.error(err);
+      toast('error', 'Failed to search products. Check your connection.');
     }
   };
 
@@ -124,10 +133,10 @@ const POS: React.FC = () => {
       if (res.success && res.data) {
         setSelectedCustomer(res.data);
       } else {
-        alert('Customer profile not found');
+        toast('error', 'Customer profile not found');
       }
     } catch (err) {
-      alert('Error fetching customer records');
+      toast('error', 'Error fetching customer records');
     }
   };
 
@@ -231,7 +240,7 @@ const POS: React.FC = () => {
       const card = parseFloat(splitCard) || 0;
       const upi = parseFloat(splitUpi) || 0;
       if (cash + card + upi !== calcs.finalAmount) {
-        alert(`Split total (${cash + card + upi}) does not match net payable (${calcs.finalAmount})`);
+        toast('error', `Split total (${cash + card + upi}) does not match net payable (${calcs.finalAmount})`);
         return;
       }
       details.CASH = cash;
@@ -263,7 +272,7 @@ const POS: React.FC = () => {
         setStorePromoDiscount('0');
       }
     } catch (err: any) {
-      alert(err.message || 'Checkout compilation error.');
+      toast('error', err.message || 'Checkout compilation error.');
     }
   };
 
@@ -290,7 +299,114 @@ const POS: React.FC = () => {
   };
 
   const downloadPdf = (invoiceId: string) => {
-    window.open(`http://localhost:8080/api/invoices/${invoiceId}/pdf`, '_blank');
+    window.open(`${API_BASE_URL}/invoices/${invoiceId}/pdf`, '_blank');
+  };
+
+  // Barcode scan handler
+  const handleBarcodeScan = async () => {
+    if (!barcodeValue.trim()) return;
+    try {
+      // Search product by barcode using the search endpoint
+      const res: any = await api.get(`/products/search?term=${encodeURIComponent(barcodeValue)}`);
+      if (res.success && res.data && res.data.length > 0) {
+        addToCart(res.data[0]);
+        toast('success', `Scanned: ${res.data[0].name}`);
+      } else {
+        toast('error', `Product with barcode ${barcodeValue} not found`);
+      }
+    } catch (err) {
+      toast('error', 'Barcode scan lookup failed.');
+    }
+    setBarcodeValue('');
+  };
+
+  // Handle barcode input enter key
+  useEffect(() => {
+    if (barcodeValue.endsWith('\n') || barcodeValue.endsWith('\r')) {
+      handleBarcodeScan();
+    }
+  }, [barcodeValue]);
+
+  // Auto-focus barcode input when toggled
+  useEffect(() => {
+    if (barcodeMode && barcodeInputRef.current) {
+      barcodeInputRef.current.focus();
+    }
+  }, [barcodeMode]);
+
+  // Print receipt function
+  const handlePrintReceipt = () => {
+    if (!receiptInvoice) return;
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    
+    const itemsHtml = receiptInvoice.items
+      .map(
+        (item: any) =>
+          `<tr>
+            <td style="padding: 6px; border-bottom: 1px dashed #ccc;">${item.productName}</td>
+            <td style="padding: 6px; text-align: center; border-bottom: 1px dashed #ccc;">${item.quantity}</td>
+            <td style="padding: 6px; text-align: right; border-bottom: 1px dashed #ccc;">INR ${item.totalAmount.toFixed(2)}</td>
+          </tr>`
+      )
+      .join('');
+
+    printWindow.document.write(`
+      <html>
+      <head><title>Receipt</title>
+      <style>
+        body { font-family: 'Courier New', monospace; width: 280px; margin: 0 auto; padding: 10px; font-size: 11px; }
+        h2 { text-align: center; font-size: 14px; margin-bottom: 5px; }
+        .line { border-top: 1px dashed #000; margin: 8px 0; }
+        table { width: 100%; border-collapse: collapse; }
+      </style>
+      </head>
+      <body>
+        <h2>SMARTRETAIL 360</h2>
+        <p style="text-align:center;font-size:10px;">GSTIN: 29AAAAA1111A1Z1</p>
+        <div class="line"></div>
+        <p>Invoice: ${receiptInvoice.invoiceNumber}</p>
+        <p>Date: ${new Date(receiptInvoice.createdAt).toLocaleString()}</p>
+        <p>Customer: ${receiptInvoice.customerName}</p>
+        <p>Payment: ${receiptInvoice.paymentMethod}</p>
+        <div class="line"></div>
+        <table><thead><tr><th style="text-align:left;">Item</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Amt</th></tr></thead><tbody>
+        ${itemsHtml}
+        </tbody></table>
+        <div class="line"></div>
+        <p>Subtotal: INR ${receiptInvoice.subtotal.toFixed(2)}</p>
+        <p>Discount: -INR ${(receiptInvoice.itemDiscount + receiptInvoice.comboDiscount + receiptInvoice.membershipDiscount + receiptInvoice.couponDiscount + receiptInvoice.storePromotionDiscount).toFixed(2)}</p>
+        <p>Taxable: INR ${receiptInvoice.taxableValue.toFixed(2)}</p>
+        <p>GST: INR ${receiptInvoice.gstAmount.toFixed(2)}</p>
+        <div class="line"></div>
+        <p style="font-weight:bold;font-size:13px;text-align:right;">NET: INR ${receiptInvoice.finalAmount}</p>
+        <div class="line"></div>
+        <p style="text-align:center;font-size:10px;">Thank you! Visit again.</p>
+        <script>window.print();window.close();<\/script>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
+  // Email receipt handler
+  const [emailModal, setEmailModal] = useState<{open: boolean; email: string}>({ open: false, email: '' });
+  const [sendingEmail, setSendingEmail] = useState(false);
+
+  const handleEmailReceipt = async () => {
+    if (!emailModal.email.trim() || !receiptInvoice) return;
+    setSendingEmail(true);
+    try {
+      const res: any = await api.post(`/invoices/${receiptInvoice.id}/email?email=${encodeURIComponent(emailModal.email)}`);
+      if (res.success) {
+        toast('success', res.message);
+        setEmailModal({ open: false, email: '' });
+      }
+    } catch (err) {
+      toast('error', 'Failed to send invoice email.');
+    } finally {
+      setSendingEmail(false);
+    }
   };
 
   return (
@@ -299,17 +415,57 @@ const POS: React.FC = () => {
       {/* LEFT: CART ENTRY */}
       <div className="lg:col-span-2 space-y-6">
         <div className="bg-card border border-border rounded-2xl p-5 shadow-sm space-y-4">
-          <h3 className="font-bold text-sm text-foreground">Scan Barcode / Search Catalog</h3>
-          <div className="relative">
-            <Search size={16} className="absolute left-3.5 top-3.5 text-muted-foreground" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Scan item barcode or search by name / SKU..."
-              className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 text-xs focus:border-primary focus:outline-none transition-all"
-            />
+          <div className="flex justify-between items-center">
+            <h3 className="font-bold text-sm text-foreground">Search Catalog</h3>
+            <button
+              onClick={() => setBarcodeMode(!barcodeMode)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
+                barcodeMode 
+                  ? 'bg-primary text-primary-foreground border-primary' 
+                  : 'border-border text-muted-foreground hover:bg-muted'
+              }`}
+            >
+              <Barcode size={14} />
+              <span>{barcodeMode ? 'Scanner Active' : 'Barcode'}</span>
+            </button>
           </div>
+
+          {barcodeMode && (
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <QrCode size={16} className="absolute left-3 top-3 text-muted-foreground" />
+                <input
+                  ref={barcodeInputRef}
+                  type="text"
+                  value={barcodeValue}
+                  onChange={(e) => setBarcodeValue(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleBarcodeScan()}
+                  placeholder="Scan barcode or type manually..."
+                  className="w-full bg-background border border-primary rounded-xl py-3 pl-10 pr-4 text-xs focus:border-primary focus:outline-none transition-all"
+                  autoFocus
+                />
+              </div>
+              <button
+                onClick={handleBarcodeScan}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-semibold"
+              >
+                Search
+              </button>
+            </div>
+          )}
+
+          {!barcodeMode && (
+            <div className="relative">
+              <Search size={16} className="absolute left-3.5 top-3.5 text-muted-foreground" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search by name / SKU..."
+                className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 text-xs focus:border-primary focus:outline-none transition-all"
+              />
+            </div>
+          )}
 
           {/* Search results popover */}
           {searchResults.length > 0 && (
@@ -735,12 +891,74 @@ const POS: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex gap-3 mt-6">
+            <div className="flex flex-wrap gap-2 mt-6">
               <button 
                 onClick={() => downloadPdf(receiptInvoice.id)}
-                className="flex-1 py-3 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary/95 text-xs transition-all flex items-center justify-center gap-2"
+                className="flex-1 min-w-[140px] py-3 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary/95 text-xs transition-all flex items-center justify-center gap-2"
               >
-                <span>Download PDF Receipt</span>
+                <Download size={14} />
+                <span>Download PDF</span>
+              </button>
+              <button 
+                onClick={handlePrintReceipt}
+                className="flex-1 min-w-[120px] py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 text-xs transition-all flex items-center justify-center gap-2"
+              >
+                <Printer size={14} />
+                <span>Print Receipt</span>
+              </button>
+              <button 
+                onClick={() => setEmailModal({ open: true, email: '' })}
+                className="flex-1 min-w-[120px] py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 text-xs transition-all flex items-center justify-center gap-2"
+              >
+                <Mail size={14} />
+                <span>Email</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* EMAIL MODAL in RECEIPT */}
+      {emailModal.open && receiptInvoice && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-[60]">
+          <div className="bg-card border border-border text-foreground rounded-3xl p-6 w-full max-w-md shadow-xl space-y-4">
+            <div className="flex items-center gap-3">
+              <Mail size={20} className="text-primary" />
+              <h3 className="font-bold text-lg">Email Invoice</h3>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Send invoice {receiptInvoice.invoiceNumber} as PDF attachment.
+            </p>
+            <input
+              type="email"
+              value={emailModal.email}
+              onChange={(e) => setEmailModal({ ...emailModal, email: e.target.value })}
+              placeholder="customer@example.com"
+              className="w-full bg-background border border-border rounded-xl py-2.5 px-3 text-xs focus:outline-none focus:border-primary"
+            />
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setEmailModal({ open: false, email: '' })}
+                className="px-4 py-2 border border-border rounded-xl text-xs hover:bg-muted transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEmailReceipt}
+                disabled={sendingEmail}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-semibold hover:bg-primary/95 transition-all disabled:opacity-50 flex items-center gap-2"
+              >
+                {sendingEmail ? (
+                  <>
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <Mail size={14} />
+                    <span>Send Invoice</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

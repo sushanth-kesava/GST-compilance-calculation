@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import api from '../services/api';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -6,9 +6,12 @@ import {
 } from 'recharts';
 import { 
   TrendingUp, DollarSign, Percent, 
-  AlertTriangle, ArrowRight, Layers 
+  AlertTriangle, ArrowRight, Layers, Receipt, Zap
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useToast } from '../components/Toast';
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 
 interface DashboardStats {
   todaySales: number;
@@ -25,25 +28,74 @@ interface DashboardStats {
 const COLORS = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b'];
 
 const Dashboard: React.FC = () => {
+  const { toast } = useToast();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [realTimeNotifications, setRealTimeNotifications] = useState<string[]>([]);
+  const wsRef = useRef<any>(null);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const res: any = await api.get('/analytics/dashboard');
       if (res.success && res.data) {
         setStats(res.data);
       }
     } catch (err) {
-      console.error('Failed to load dashboard data', err);
+      toast('error', 'Failed to load dashboard data. Check your connection.');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // Real-time WebSocket subscription for live invoice updates
+  useEffect(() => {
+    const API_WS_URL = import.meta.env.VITE_API_BASE_URL 
+      ? import.meta.env.VITE_API_BASE_URL.replace('/api', '') 
+      : 'http://localhost:8080';
+
+    const client = new Client({
+      webSocketFactory: () => new SockJS(`${API_WS_URL}/ws`),
+      reconnectDelay: 5000,
+      onConnect: () => {
+        // Subscribe to new invoices
+        client.subscribe('/topic/invoices', (message) => {
+          try {
+            const invoice = JSON.parse(message.body);
+            // Show a brief toast notification
+            toast('success', `New invoice: ${invoice.invoiceNumber} - INR ${invoice.finalAmount}`);
+            // Refresh dashboard data
+            fetchStats();
+            // Add to real-time notification list
+            setRealTimeNotifications((prev) => 
+              [`${invoice.invoiceNumber} - ${invoice.customerName} - INR ${invoice.finalAmount}`, ...prev].slice(0, 20)
+            );
+            // Auto-clear notifications after 15 seconds
+            setTimeout(() => {
+              setRealTimeNotifications((prev) => prev.slice(0, -1));
+            }, 15000);
+          } catch (e) {
+            // ignore parse errors
+          }
+        });
+      },
+      onDisconnect: () => {
+        // Will auto-reconnect
+      },
+    });
+
+    client.activate();
+    wsRef.current = client;
+
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.deactivate();
+      }
+    };
+  }, [fetchStats]);
 
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [fetchStats]);
 
   if (loading || !stats) {
     return (
@@ -78,6 +130,13 @@ const Dashboard: React.FC = () => {
               <span>{stats.lowStockCount} Low Stock Warnings</span>
             </Link>
           )}
+          <Link
+            to="/invoices"
+            className="flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl text-sm font-semibold transition-all border border-primary/20"
+          >
+            <Receipt size={16} />
+            <span>Invoice History</span>
+          </Link>
         </div>
       </div>
 
@@ -163,6 +222,26 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* REAL-TIME NOTIFICATIONS BANNER */}
+      {realTimeNotifications.length > 0 && (
+        <div className="bg-card border border-primary/30 rounded-2xl p-4 shadow-sm space-y-2">
+          <div className="flex items-center gap-2 text-xs font-bold text-primary">
+            <Zap size={14} className="animate-pulse" />
+            <span>Real-Time Invoice Activity</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {realTimeNotifications.map((notif, idx) => (
+              <span 
+                key={idx} 
+                className="bg-primary/5 text-primary text-[10px] px-2.5 py-1 rounded-full border border-primary/20 font-semibold animate-fade-in"
+              >
+                {notif}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* RECENT TRANSACTIONS TABLE */}
       <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">

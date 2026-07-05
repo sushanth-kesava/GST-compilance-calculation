@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { Truck, Award, AlertCircle, ShoppingBag, Plus } from 'lucide-react';
+import { useToast } from '../components/Toast';
 
 interface Supplier {
   id?: string;
@@ -19,6 +20,8 @@ const Suppliers: React.FC = () => {
   const purchaseOrders: any[] = [];
   const [showModal, setShowModal] = useState(false);
 
+  const { toast } = useToast();
+
   // Supplier Form
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
@@ -34,7 +37,7 @@ const Suppliers: React.FC = () => {
         setSuppliers(res.data);
       }
     } catch (err) {
-      console.error(err);
+      toast('error', 'Failed to load suppliers.');
     }
   };
 
@@ -59,7 +62,7 @@ const Suppliers: React.FC = () => {
       setShowModal(false);
       fetchSuppliers();
     } catch (err) {
-      alert('Failed to register supplier');
+      toast('error', 'Failed to register supplier');
     }
   };
 

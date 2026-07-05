@@ -73,46 +73,43 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
   ];
 
   return (
-    <div className="fixed inset-y-0 right-0 w-full max-w-md bg-slate-900 border-l border-slate-800 shadow-2xl z-50 flex flex-col text-white transition-all duration-300">
+    <div className="fixed inset-y-0 right-0 w-full max-w-md bg-white border-l border-gray-200 shadow-lg z-50 flex flex-col text-slate-900 transition-all duration-300">
       {/* Header */}
-      <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+      <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-white">
         <div className="flex items-center gap-2">
-          <Sparkles className="text-purple-400" size={20} />
-          <h3 className="font-bold text-base text-slate-100">SmartRetail Copilot</h3>
+          <Sparkles size={20} style={{color: 'hsl(var(--primary))'}} />
+          <h3 className="font-bold text-base" style={{color: 'hsl(var(--primary))'}}>SmartRetail Copilot</h3>
         </div>
         <button 
           onClick={onClose}
-          className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-all"
+          className="p-1 rounded-lg hover:bg-gray-100 text-slate-500 hover:text-slate-700 transition-all"
         >
           <X size={18} />
         </button>
       </div>
 
       {/* Tabs */}
-      <div className="flex bg-slate-950 border-b border-slate-800 p-1 text-xs">
+      <div className="flex bg-white border-b border-gray-200 p-1 text-xs">
         <button
           onClick={() => setActiveTab('copilot')}
-          className={`flex-1 py-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 transition-all ${
-            activeTab === 'copilot' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
-          }`}
+          className="flex-1 py-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 transition-all"
+          style={activeTab === 'copilot' ? {backgroundColor: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))', boxShadow: '0 1px 6px rgba(0,0,0,0.08)'} : {color: 'hsl(var(--primary))'}}
         >
           <Compass size={14} />
           Copilot
         </button>
         <button
           onClick={() => setActiveTab('simulator')}
-          className={`flex-1 py-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 transition-all ${
-            activeTab === 'simulator' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
-          }`}
+          className="flex-1 py-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 transition-all"
+          style={activeTab === 'simulator' ? {backgroundColor: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))', boxShadow: '0 1px 6px rgba(0,0,0,0.08)'} : {color: 'hsl(var(--primary))'}}
         >
           <Calculator size={14} />
           Math Engine
         </button>
         <button
           onClick={() => setActiveTab('glossary')}
-          className={`flex-1 py-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 transition-all ${
-            activeTab === 'glossary' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'
-          }`}
+          className="flex-1 py-2 rounded-lg font-semibold flex items-center justify-center gap-1.5 transition-all"
+          style={activeTab === 'glossary' ? {backgroundColor: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))', boxShadow: '0 1px 6px rgba(0,0,0,0.08)'} : {color: 'hsl(var(--primary))'}}
         >
           <BookOpen size={14} />
           ERP Glossary
@@ -127,27 +124,27 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
             {/* Dashboard Guide */}
             {path === '/' && (
               <>
-                <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-4">
-                  <h4 className="font-bold text-sm text-purple-400 flex items-center gap-2 mb-2">
-                    <TrendingUp size={16} /> Dashboard Guide
+                <div className="bg-white border border-black rounded-2xl p-4">
+                  <h4 className="font-bold text-sm text-slate-900 flex items-center gap-2 mb-2">
+                    <TrendingUp size={16} className="text-black"/> Dashboard Guide
                   </h4>
-                  <p className="text-xs text-slate-300 leading-relaxed">
+                  <p className="text-xs text-slate-700 leading-relaxed">
                     This screen displays live summaries of retail business performance. The ERP polls sales transactions, low-stock lines, and payment balances dynamically.
                   </p>
                 </div>
                 <div className="space-y-3">
-                  <h5 className="font-bold text-xs text-slate-400 uppercase tracking-wider">Key Functions</h5>
-                  <div className="bg-slate-950/40 border border-slate-800/80 rounded-xl p-3 flex gap-3 text-xs leading-relaxed">
-                    <ChevronRight size={14} className="text-purple-400 shrink-0 mt-0.5" />
+                  <h5 className="font-bold text-xs text-slate-500 uppercase tracking-wider">Key Functions</h5>
+                  <div className="bg-white border border-gray-200 rounded-xl p-3 flex gap-3 text-xs leading-relaxed">
+                    <ChevronRight size={14} className="text-black shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-slate-200 block mb-1">Today's Sales & Margin</strong>
+                      <strong className="text-slate-900 block mb-1">Today's Sales & Margin</strong>
                       Computes total invoices processed today and displays the net profit margin after subtracting cost prices from selling prices.
                     </div>
                   </div>
-                  <div className="bg-slate-950/40 border border-slate-800/80 rounded-xl p-3 flex gap-3 text-xs leading-relaxed">
-                    <ChevronRight size={14} className="text-purple-400 shrink-0 mt-0.5" />
+                  <div className="bg-white border border-gray-200 rounded-xl p-3 flex gap-3 text-xs leading-relaxed">
+                    <ChevronRight size={14} className="text-black shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-slate-200 block mb-1">Low Stock alerts</strong>
+                      <strong className="text-slate-900 block mb-1">Low Stock alerts</strong>
                       Alerts generated when total stock drops below the minimum reorder point. Alerts are synchronized dynamically in the system navbar.
                     </div>
                   </div>
@@ -158,11 +155,11 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
             {/* POS Billing Guide */}
             {path === '/pos' && (
               <>
-                <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-4">
-                  <h4 className="font-bold text-sm text-purple-400 flex items-center gap-2 mb-2">
-                    <Calculator size={16} /> POS Billing Engine
+                <div className="bg-white border border-black rounded-2xl p-4">
+                  <h4 className="font-bold text-sm text-slate-900 flex items-center gap-2 mb-2">
+                    <Calculator size={16} className="text-black"/> POS Billing Engine
                   </h4>
-                  <p className="text-xs text-slate-300 leading-relaxed">
+                  <p className="text-xs text-slate-700 leading-relaxed">
                     SmartRetail 360 uses a sequential billing engine to ensure error-free calculations. Discounts and taxes are applied strictly in order to prevent compliance issues.
                   </p>
                 </div>
@@ -198,9 +195,9 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
                   </div>
                 </div>
 
-                <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-xs flex gap-2">
-                  <Info className="text-amber-500 shrink-0 mt-0.5" size={16} />
-                  <p className="text-slate-300 leading-relaxed">
+                <div className="bg-white border border-black rounded-xl p-3 text-xs flex gap-2">
+                  <Info className="text-black shrink-0 mt-0.5" size={16} />
+                  <p className="text-slate-700 leading-relaxed">
                     Use the <strong>Math Engine</strong> tab to simulate calculations step-by-step using actual inputs!
                   </p>
                 </div>
@@ -210,23 +207,23 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
             {/* Inventory Guide */}
             {path === '/inventory' && (
               <>
-                <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-4">
-                  <h4 className="font-bold text-sm text-purple-400 flex items-center gap-2 mb-2">
-                    <Layers size={16} /> Inventory Module
+                <div className="bg-white border border-black rounded-2xl p-4">
+                  <h4 className="font-bold text-sm text-slate-900 flex items-center gap-2 mb-2">
+                    <Layers size={16} className="text-black"/> Inventory Module
                   </h4>
-                  <p className="text-xs text-slate-300 leading-relaxed">
+                  <p className="text-xs text-slate-700 leading-relaxed">
                     Manages live stock counts across multiple warehouse locations, automatically monitoring reorder levels to prevent out-of-stock items.
                   </p>
                 </div>
 
                 <div className="space-y-3">
-                  <h5 className="font-bold text-xs text-slate-400 uppercase tracking-wider">Features Explained</h5>
-                  <div className="bg-slate-950/40 border border-slate-800/80 rounded-xl p-3 text-xs leading-relaxed">
-                    <strong className="text-slate-200 block mb-1">SKU & Barcodes</strong>
+                  <h5 className="font-bold text-xs text-gray-700 uppercase tracking-wider">Features Explained</h5>
+                  <div className="bg-white border border-gray-200 rounded-xl p-3 text-xs leading-relaxed">
+                    <strong className="text-black block mb-1">SKU & Barcodes</strong>
                     Generates barcodes automatically when products are added. Supports standard scanners during checkout on the POS view.
                   </div>
-                  <div className="bg-slate-950/40 border border-slate-800/80 rounded-xl p-3 text-xs leading-relaxed">
-                    <strong className="text-slate-200 block mb-1">Multi-Warehouse Allocation</strong>
+                  <div className="bg-white border border-gray-200 rounded-xl p-3 text-xs leading-relaxed">
+                    <strong className="text-black block mb-1">Multi-Warehouse Allocation</strong>
                     Divides inventory among different branches. Moving stock requires registering warehouse transfers in settings.
                   </div>
                 </div>
@@ -236,32 +233,32 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
             {/* Customers & Loyalty Guide */}
             {path === '/customers' && (
               <>
-                <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-4">
-                  <h4 className="font-bold text-sm text-purple-400 flex items-center gap-2 mb-2">
-                    <Award size={16} /> Loyalty & Reward points
+                <div className="bg-white border border-black rounded-2xl p-4">
+                  <h4 className="font-bold text-sm text-slate-900 flex items-center gap-2 mb-2">
+                    <Award size={16} className="text-black"/> Loyalty & Reward points
                   </h4>
-                  <p className="text-xs text-slate-300 leading-relaxed">
+                  <p className="text-xs text-slate-700 leading-relaxed">
                     Engage customers through gamified rewards and tiered benefits. Purchase totals automatically convert to points and upgrade customer tiers.
                   </p>
                 </div>
 
                 <div className="space-y-3">
-                  <h5 className="font-bold text-xs text-slate-400 uppercase tracking-wider">Membership Benefits</h5>
+                  <h5 className="font-bold text-xs text-gray-700 uppercase tracking-wider">Membership Benefits</h5>
                   <div className="grid grid-cols-3 gap-2">
-                    <div className="bg-slate-950/40 border border-slate-850 p-2 rounded-xl text-center">
-                      <span className="text-slate-300 text-xs font-semibold block">Silver</span>
+                    <div className="bg-white border border-gray-200 p-2 rounded-xl text-center">
+                      <span className="text-black text-xs font-semibold block">Silver</span>
                       <span className="text-purple-400 font-bold text-sm">5% Off</span>
-                      <span className="text-[10px] text-slate-500 block mt-1">Earning: 1x</span>
+                      <span className="text-[10px] text-gray-500 block mt-1">Earning: 1x</span>
                     </div>
-                    <div className="bg-slate-950/40 border border-slate-850 p-2 rounded-xl text-center border-purple-500/20">
-                      <span className="text-slate-300 text-xs font-semibold block">Gold</span>
+                    <div className="bg-white border border-gray-200 p-2 rounded-xl text-center border-purple-500/20">
+                      <span className="text-black text-xs font-semibold block">Gold</span>
                       <span className="text-purple-400 font-bold text-sm">10% Off</span>
-                      <span className="text-[10px] text-slate-500 block mt-1">Earning: 1.5x</span>
+                      <span className="text-[10px] text-gray-500 block mt-1">Earning: 1.5x</span>
                     </div>
-                    <div className="bg-slate-950/40 border border-slate-850 p-2 rounded-xl text-center border-purple-500/30">
-                      <span className="text-slate-300 text-xs font-semibold block">Premium</span>
+                    <div className="bg-white border border-gray-200 p-2 rounded-xl text-center border-purple-500/30">
+                      <span className="text-black text-xs font-semibold block">Premium</span>
                       <span className="text-purple-400 font-bold text-sm">15% Off</span>
-                      <span className="text-[10px] text-slate-500 block mt-1">Earning: 2x</span>
+                      <span className="text-[10px] text-gray-500 block mt-1">Earning: 2x</span>
                     </div>
                   </div>
                 </div>
@@ -271,27 +268,27 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
             {/* AI Panel Guide */}
             {path === '/ai-panel' && (
               <>
-                <div className="bg-purple-500/10 border border-purple-500/20 rounded-2xl p-4">
-                  <h4 className="font-bold text-sm text-purple-400 flex items-center gap-2 mb-2">
-                    <Sparkles size={16} /> AI Analytics & Anomalies
+                <div className="bg-white border border-gray-200 rounded-2xl p-4">
+                  <h4 className="font-bold text-sm text-black flex items-center gap-2 mb-2">
+                    <Sparkles size={16} style={{color: 'hsl(var(--primary))'}} /> AI Analytics & Anomalies
                   </h4>
-                  <p className="text-xs text-slate-300 leading-relaxed">
+                  <p className="text-xs text-gray-700 leading-relaxed">
                     Our AI models analyze transaction logs to segment customers, forecast supply demand, and flag fraudulent activities automatically.
                   </p>
                 </div>
 
                 <div className="space-y-3">
                   <h5 className="font-bold text-xs text-slate-400 uppercase tracking-wider">AI Engines Explained</h5>
-                  <div className="bg-slate-950/40 border border-slate-800/80 rounded-xl p-3 text-xs leading-relaxed">
-                    <strong className="text-slate-200 block mb-1">RFM Segmentation</strong>
+                  <div className="bg-white border border-gray-200 rounded-xl p-3 text-xs leading-relaxed">
+                      <strong className="text-black block mb-1">RFM Segmentation</strong>
                     Clusters customers into: VIP, loyal, high-risk, or lost based on shopping behaviors. Allows targeting marketing offers.
                   </div>
-                  <div className="bg-slate-950/40 border border-slate-800/80 rounded-xl p-3 text-xs leading-relaxed">
-                    <strong className="text-slate-200 block mb-1">Demand Forecasting</strong>
+                    <div className="bg-white border border-gray-200 rounded-xl p-3 text-xs leading-relaxed">
+                      <strong className="text-black block mb-1">Demand Forecasting</strong>
                     Computes three-month sales projections using historical trends to help inventory managers procure items before stockouts occur.
                   </div>
-                  <div className="bg-slate-950/40 border border-slate-800/80 rounded-xl p-3 text-xs leading-relaxed">
-                    <strong className="text-slate-200 block mb-1">Fraud Detection Alerts</strong>
+                    <div className="bg-white border border-gray-200 rounded-xl p-3 text-xs leading-relaxed">
+                      <strong className="text-black block mb-1">Fraud Detection Alerts</strong>
                     Identifies double-invoiced checkouts, refund irregularities (abnormal values), and coupon code abuse attempts.
                   </div>
                 </div>
@@ -311,38 +308,38 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
         {/* Tab 2: Billing Math Engine Simulator */}
         {activeTab === 'simulator' && (
           <div className="space-y-4">
-            <div className="bg-slate-950/40 border border-slate-800 p-4 rounded-2xl space-y-3 text-xs">
-              <h4 className="font-bold text-sm text-slate-200 flex items-center gap-1.5 border-b border-slate-800 pb-2">
-                <Calculator size={16} className="text-purple-400" /> Math Engine Inputs
+            <div className="bg-white border border-gray-200 p-4 rounded-2xl space-y-3 text-xs">
+              <h4 className="font-bold text-sm flex items-center gap-1.5 border-b border-gray-200 pb-2" style={{color: 'hsl(var(--primary))'}}>
+                <Calculator size={16} style={{color: 'hsl(var(--primary))'}} /> Math Engine Inputs
               </h4>
               
               <div className="space-y-2">
                 <div>
-                  <label className="block text-slate-400 mb-1">Subtotal (INR)</label>
+                  <label className="block text-gray-700 mb-1">Subtotal (INR)</label>
                   <input
                     type="number"
                     value={simSubtotal}
                     onChange={(e) => setSimSubtotal(Math.max(0, parseFloat(e.target.value) || 0))}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 font-semibold focus:border-purple-500 focus:outline-none"
+                    className="w-full bg-white border border-gray-200 rounded-lg p-2 text-black font-semibold focus:border-purple-500 focus:outline-none"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-slate-400 mb-1">Item Discount (INR)</label>
+                    <label className="block text-gray-700 mb-1">Item Discount (INR)</label>
                     <input
                       type="number"
                       value={simItemDisc}
                       onChange={(e) => setSimItemDisc(Math.max(0, parseFloat(e.target.value) || 0))}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 font-semibold focus:border-purple-500 focus:outline-none"
+                      className="w-full bg-white border border-gray-200 rounded-lg p-2 text-black font-semibold focus:border-purple-500 focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 mb-1">GST Rate (%)</label>
+                    <label className="block text-gray-700 mb-1">GST Rate (%)</label>
                     <select
                       value={simGstRate}
                       onChange={(e) => setSimGstRate(parseInt(e.target.value))}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 font-semibold focus:border-purple-500 focus:outline-none"
+                      className="w-full bg-white border border-gray-200 rounded-lg p-2 text-black font-semibold focus:border-purple-500 focus:outline-none"
                     >
                       <option value={5}>5%</option>
                       <option value={12}>12%</option>
@@ -354,11 +351,11 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-slate-400 mb-1">Customer Level</label>
+                    <label className="block text-gray-700 mb-1">Customer Level</label>
                     <select
                       value={simMemberTier}
                       onChange={(e) => setSimMemberTier(e.target.value as any)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 font-semibold focus:border-purple-500 focus:outline-none"
+                      className="w-full bg-white border border-gray-200 rounded-lg p-2 text-black font-semibold focus:border-purple-500 focus:outline-none"
                     >
                       <option value="walkin">Walk-in (0%)</option>
                       <option value="silver">Silver Member (5%)</option>
@@ -367,11 +364,11 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-slate-400 mb-1">Coupon Applied</label>
+                    <label className="block text-gray-700 mb-1">Coupon Applied</label>
                     <select
                       value={simCouponCode}
                       onChange={(e) => setSimCouponCode(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 font-semibold focus:border-purple-500 focus:outline-none"
+                      className="w-full bg-white border border-gray-200 rounded-lg p-2 text-black font-semibold focus:border-purple-500 focus:outline-none"
                     >
                       <option value="">None</option>
                       <option value="SAVE10">SAVE10 (10% off)</option>
@@ -380,7 +377,7 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between py-1 bg-slate-900/30 rounded-lg px-2 border border-slate-800">
+                <div className="flex items-center justify-between py-1 bg-white rounded-lg px-2 border border-gray-200">
                   <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -389,17 +386,17 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
                       onChange={(e) => setSimHasCombo(e.target.checked)}
                       className="rounded accent-purple-600 cursor-pointer"
                     />
-                    <label htmlFor="simHasCombo" className="text-slate-300 font-semibold cursor-pointer">Combo Deal? (Buy 3+ items)</label>
+                    <label htmlFor="simHasCombo" className="text-black font-semibold cursor-pointer">Combo Deal? (Buy 3+ items)</label>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between py-1 bg-slate-900/30 rounded-lg px-2 border border-slate-800">
-                  <span className="text-slate-300 font-semibold">Interstate Trade?</span>
+                <div className="flex items-center justify-between py-1 bg-white rounded-lg px-2 border border-gray-200">
+                  <span className="text-black font-semibold">Interstate Trade?</span>
                   <button
                     type="button"
                     onClick={() => setSimIsInterstate(!simIsInterstate)}
                     className={`w-10 h-5.5 rounded-full p-0.5 transition-all focus:outline-none ${
-                      simIsInterstate ? 'bg-purple-600 flex justify-end' : 'bg-slate-700 flex justify-start'
+                      simIsInterstate ? 'bg-purple-600 flex justify-end' : 'bg-gray-200 flex justify-start'
                     }`}
                   >
                     <span className="w-4.5 h-4.5 rounded-full bg-white shadow-md block"></span>
@@ -409,15 +406,15 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
             </div>
 
             {/* Calculations Engine Output */}
-            <div className="bg-purple-950/20 border border-purple-500/20 rounded-2xl p-4 text-xs space-y-2.5">
-              <h4 className="font-bold text-sm text-purple-400 border-b border-purple-500/10 pb-1.5 flex justify-between items-center">
+            <div className="bg-white border border-gray-200 rounded-2xl p-4 text-xs space-y-2.5">
+              <h4 className="font-bold text-sm border-b border-gray-200 pb-1.5 flex justify-between items-center" style={{color: 'hsl(var(--primary))'}}>
                 <span>Calculation Trace</span>
                 <span className="text-[10px] bg-purple-500/15 px-2 py-0.5 rounded-full font-semibold">Sequence order</span>
               </h4>
 
               <div className="flex justify-between items-center">
-                <span className="text-slate-400">1. Subtotal (MRP)</span>
-                <span className="font-semibold text-slate-100">₹{simSubtotal.toFixed(2)}</span>
+                <span className="text-gray-700">1. Subtotal (MRP)</span>
+                <span className="font-semibold text-black">₹{simSubtotal.toFixed(2)}</span>
               </div>
 
               <div className="flex justify-between items-center text-red-400">
@@ -440,9 +437,9 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
                 <span>₹{couponDiscount.toFixed(2)}</span>
               </div>
 
-              <div className="h-px bg-slate-800 my-1"></div>
+              <div className="h-px bg-gray-200 my-1"></div>
 
-              <div className="flex justify-between items-center font-bold text-slate-200">
+              <div className="flex justify-between items-center font-bold text-black">
                 <span>6. Taxable Value (Base)</span>
                 <span>₹{taxableValue.toFixed(2)}</span>
               </div>
@@ -453,14 +450,14 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
               </div>
 
               {isInterstate ? (
-                <div className="bg-slate-950/40 p-2 rounded-lg border border-slate-800 flex justify-between text-[10px] text-slate-400 leading-normal">
+                <div className="bg-gray-100 p-2 rounded-lg border border-gray-200 flex justify-between text-[10px] text-black leading-normal">
                   <span>Routing to Central IGST (Interstate):</span>
-                  <span className="font-semibold text-slate-300">IGST: ₹{gstAmount.toFixed(2)} (Destination: {customerState})</span>
+                  <span className="font-semibold text-black">IGST: ₹{gstAmount.toFixed(2)} (Destination: {customerState})</span>
                 </div>
               ) : (
-                <div className="bg-slate-950/40 p-2 rounded-lg border border-slate-800 flex justify-between text-[10px] text-slate-400 leading-normal">
+                <div className="bg-gray-100 p-2 rounded-lg border border-gray-200 flex justify-between text-[10px] text-black leading-normal">
                   <span>Routing local Karnataka Trade (50/50):</span>
-                  <span className="font-semibold text-slate-300">CGST ({(simGstRate/2).toFixed(1)}%): ₹{(gstAmount/2).toFixed(2)}<br/>SGST ({(simGstRate/2).toFixed(1)}%): ₹{(gstAmount/2).toFixed(2)}</span>
+                  <span className="font-semibold text-black">CGST ({(simGstRate/2).toFixed(1)}%): ₹{(gstAmount/2).toFixed(2)}<br/>SGST ({(simGstRate/2).toFixed(1)}%): ₹{(gstAmount/2).toFixed(2)}</span>
                 </div>
               )}
 
@@ -469,11 +466,11 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
                 <span>₹{roundOff >= 0 ? '+' : ''}{roundOff.toFixed(2)}</span>
               </div>
 
-              <div className="h-px bg-slate-800 my-1"></div>
+              <div className="h-px bg-gray-200 my-1"></div>
 
-              <div className="flex justify-between items-center font-extrabold text-sm text-slate-100 bg-slate-950/50 p-2 rounded-xl border border-slate-800">
-                <span className="text-purple-400">Final Total Amount</span>
-                <span className="text-slate-100">₹{finalTotal.toFixed(2)}</span>
+              <div className="flex justify-between items-center font-extrabold text-sm text-black bg-gray-100 p-2 rounded-xl border border-gray-200">
+                <span style={{color: 'hsl(var(--primary))'}}>Final Total Amount</span>
+                <span className="text-black">₹{finalTotal.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -489,9 +486,9 @@ const ERPGuide: React.FC<ERPGuideProps> = ({ isOpen, onClose }) => {
 
             <div className="space-y-3 mt-4">
               {glossaryItems.map((item, idx) => (
-                <div key={idx} className="bg-slate-950/40 border border-slate-800 rounded-xl p-3">
-                  <strong className="text-xs text-purple-400 block mb-1">{item.term}</strong>
-                  <p className="text-[11px] text-slate-300 leading-relaxed">{item.desc}</p>
+                <div key={idx} className="bg-white border border-gray-200 rounded-xl p-3">
+                  <strong className="text-xs" style={{color: 'hsl(var(--primary))'}}>{item.term}</strong>
+                  <p className="text-[11px] text-gray-700 leading-relaxed">{item.desc}</p>
                 </div>
               ))}
             </div>

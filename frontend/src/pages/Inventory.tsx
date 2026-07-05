@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import api from '../services/api';
 import { 
   Plus, Edit3, Trash2, AlertTriangle, 
   Upload, CheckCircle, PackageSearch 
 } from 'lucide-react';
+import { useToast } from '../components/Toast';
 
 interface Product {
   id?: string;
@@ -56,6 +57,9 @@ const Inventory: React.FC = () => {
   // Excel file import
   const [importing, setImporting] = useState(false);
   const [importMsg, setImportMsg] = useState('');
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const { toast } = useToast();
 
   const fetchInventory = async () => {
     try {
@@ -64,7 +68,7 @@ const Inventory: React.FC = () => {
         setProducts(res.data);
       }
     } catch (err) {
-      console.error(err);
+      toast('error', 'Failed to load inventory data.');
     }
   };
 
@@ -75,7 +79,7 @@ const Inventory: React.FC = () => {
         setCategories(res.data);
       }
     } catch (err) {
-      console.error(err);
+      toast('error', 'Failed to load categories.');
     }
   };
 
@@ -144,7 +148,7 @@ const Inventory: React.FC = () => {
       setShowModal(false);
       fetchInventory();
     } catch (err) {
-      alert('Error saving product parameters');
+      toast('error', 'Error saving product parameters.');
     }
   };
 
@@ -154,27 +158,36 @@ const Inventory: React.FC = () => {
       await api.delete(`/products/${id}`);
       fetchInventory();
     } catch (err) {
-      alert('Delete failed. Verify your manager access privileges.');
+      toast('error', 'Delete failed. Verify your manager access privileges.');
     }
   };
 
-  // Mock Excel import
-  const handleExcelImport = async () => {
+  // Excel file import - uses a hidden file input
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    handleExcelImport(file);
+    // Reset input so the same file can be re-uploaded
+    e.target.value = '';
+  };
+
+  const handleExcelImport = async (file: File) => {
     setImporting(true);
     setImportMsg('');
     try {
-      // Simulate multipart file spreadsheet upload
       const formData = new FormData();
-      const mockFile = new File(["sku,name,mrp\n101,softdrink,99"], "inventory.xlsx", { type: "application/vnd.ms-excel" });
-      formData.append("file", mockFile);
+      formData.append("file", file);
       
       const res: any = await api.post('/products/import', formData);
       if (res.success) {
         setImportMsg(res.message);
+        toast('success', res.message);
         fetchInventory();
       }
     } catch (err) {
-      setImportMsg('Failed to process spreadsheet files.');
+      const msg = 'Failed to process spreadsheet file. Ensure it is a valid Excel or CSV file.';
+      setImportMsg(msg);
+      toast('error', msg);
     } finally {
       setImporting(false);
     }
@@ -199,13 +212,20 @@ const Inventory: React.FC = () => {
           <p className="text-sm text-muted-foreground">Manage SKUs, product pricing matrix, and stock levels.</p>
         </div>
         <div className="flex gap-3">
+          <input
+            type="file"
+            accept=".xlsx,.xls,.csv"
+            onChange={handleFileSelect}
+            ref={fileInputRef}
+            className="hidden"
+          />
           <button 
-            onClick={handleExcelImport}
+            onClick={() => fileInputRef.current?.click()}
             disabled={importing}
             className="flex items-center gap-2 px-4 py-2 border border-border bg-card hover:bg-muted text-foreground rounded-xl text-xs font-semibold transition-all disabled:opacity-50"
           >
             <Upload size={14} />
-            <span>{importing ? 'Importing Excel...' : 'Bulk Excel Import'}</span>
+            <span>{importing ? 'Importing...' : 'Bulk Excel Import'}</span>
           </button>
           <button 
             onClick={handleOpenCreate}

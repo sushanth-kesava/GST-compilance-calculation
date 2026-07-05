@@ -57,6 +57,8 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.isActive() && user.isVerified();
+        // Since we removed OTP/email verification, only check if the account is active.
+        // 'verified' field can be false for legacy users in the database.
+        return user.isActive();
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -42,6 +43,24 @@ public class JwtTokenProvider {
                 .setSubject(userPrincipal.getUsername())
                 .claim("roles", roles)
                 .claim("userId", userPrincipal.getUser().getId())
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
+    }
+
+    public String generateTokenFromUsername(String username, String userId, Set<com.smartretail360.model.Role> roles) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
+
+        String rolesStr = roles.stream()
+                .map(Enum::name)
+                .collect(Collectors.joining(","));
+
+        return Jwts.builder()
+                .setSubject(username)
+                .claim("roles", rolesStr)
+                .claim("userId", userId)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(key, SignatureAlgorithm.HS512)

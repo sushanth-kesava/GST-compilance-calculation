@@ -1,16 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Settings as SettingsIcon, Save, Store, ShieldAlert, Cpu } from 'lucide-react';
+import api from '../services/api';
+import { useToast } from '../components/Toast';
 
 const Settings: React.FC = () => {
-  const [storeName, setStoreName] = useState('SmartRetail 360 flagship');
-  const [storeGstin, setStoreGstin] = useState('29AAAAA1111A1Z1');
-  const [storeState, setStoreState] = useState('Karnataka');
+  const { toast } = useToast();
+  const [storeName, setStoreName] = useState('');
+  const [storeGstin, setStoreGstin] = useState('');
+  const [storeState, setStoreState] = useState('');
   const [msg, setMsg] = useState('');
 
-  const handleSave = (e: React.FormEvent) => {
+  const fetchStoreConfig = async () => {
+    try {
+      const res: any = await api.get('/settings/store');
+      if (res.success && res.data) {
+        setStoreName(res.data.name || '');
+        setStoreGstin(res.data.gstin || '');
+        setStoreState(res.data.state || '');
+      }
+    } catch (err) {
+      // Fallback to defaults if settings API is not available yet
+      setStoreName('SmartRetail 360 flagship');
+      setStoreGstin('29AAAAA1111A1Z1');
+      setStoreState('Karnataka');
+      toast('warning', 'Could not connect to server. Using local defaults.');
+    }
+  };
+
+  useEffect(() => {
+    fetchStoreConfig();
+  }, []);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMsg('Store parameters saved successfully!');
-    setTimeout(() => setMsg(''), 3000);
+    try {
+      await api.put('/settings/store', {
+        name: storeName,
+        gstin: storeGstin,
+        state: storeState
+      });
+      setMsg('Store configuration saved successfully!');
+      toast('success', 'Store configuration saved successfully!');
+      setTimeout(() => setMsg(''), 3000);
+    } catch (err) {
+      toast('error', 'Failed to save store configuration.');
+    }
   };
 
   return (

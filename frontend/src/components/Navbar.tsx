@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { Bell, Check, AlertCircle, Sparkles } from 'lucide-react';
+import { useToast } from '../components/Toast';
 
 interface Notification {
   id: string;
@@ -16,6 +17,7 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ onToggleGuide }) => {
+  const { toast } = useToast();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -26,7 +28,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleGuide }) => {
         setNotifications(res.data);
       }
     } catch (err) {
-      console.error('Failed to load notifications', err);
+      toast('error', 'Failed to load notifications.');
     }
   };
 
@@ -42,7 +44,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleGuide }) => {
       await api.post(`/notifications/${id}/read`);
       setNotifications((prev) => prev.filter((n) => n.id !== id));
     } catch (err) {
-      console.error(err);
+      toast('error', 'Failed to mark notification as read.');
     }
   };
 
@@ -56,10 +58,11 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleGuide }) => {
         {/* Help/Copilot Toggle Button */}
         <button
           onClick={onToggleGuide}
-          className="px-3 py-1.5 rounded-xl border border-purple-500/30 hover:bg-purple-500/10 text-purple-400 font-semibold flex items-center gap-1.5 text-xs transition-all cursor-pointer"
+          className="px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1.5 text-xs transition-all cursor-pointer"
           title="Open SmartRetail Copilot"
+          style={{backgroundColor: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))', border: '1px solid rgba(0,0,0,0.04)'}}
         >
-          <Sparkles size={14} />
+          <Sparkles size={14} style={{color: 'hsl(var(--primary-foreground))'}} />
           <span>Copilot</span>
         </button>
 

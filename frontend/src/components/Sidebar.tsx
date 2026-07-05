@@ -13,7 +13,8 @@ import {
   LogOut, 
   Sun, 
   Moon,
-  Store
+  Store,
+  Receipt
 } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
@@ -33,6 +34,7 @@ const Sidebar: React.FC = () => {
     { to: '/customers', label: 'Customers & Loyalty', icon: Users },
     { to: '/suppliers', label: 'Suppliers', icon: Truck },
     { to: '/ai-panel', label: 'AI Insights', icon: Brain },
+    { to: '/invoices', label: 'Invoice History', icon: Receipt },
     { to: '/settings', label: 'Settings', icon: Settings },
   ];
 

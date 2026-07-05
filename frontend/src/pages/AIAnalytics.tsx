@@ -8,6 +8,7 @@ import {
   Brain, AlertTriangle, ShieldAlert, Sparkles, 
   RefreshCw, TrendingUp, BarChart3 
 } from 'lucide-react';
+import { useToast } from '../components/Toast';
 
 interface FraudAlert {
   type: string;
@@ -35,6 +36,7 @@ const AIAnalytics: React.FC = () => {
   const [selectedProductId, setSelectedProductId] = useState('');
   const [demandForecast, setDemandForecast] = useState<any[]>([]);
   
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
@@ -59,7 +61,7 @@ const AIAnalytics: React.FC = () => {
         fetchDemandForecast(prodRes.data[0].id);
       }
     } catch (err) {
-      console.error(err);
+      toast('error', 'Failed to load AI analytics data.');
     } finally {
       setLoading(false);
     }
@@ -73,7 +75,7 @@ const AIAnalytics: React.FC = () => {
         setDemandForecast(res.data);
       }
     } catch (err) {
-      console.error(err);
+      toast('error', 'Failed to load demand forecast.');
     }
   };
 

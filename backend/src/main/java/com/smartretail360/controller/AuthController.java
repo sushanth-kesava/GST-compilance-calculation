@@ -18,7 +18,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<User>> registerUser(@Valid @RequestBody SignupRequest request) {
         User user = authService.registerUser(request);
-        return ResponseEntity.ok(ApiResponse.success(user, "User registered successfully. Verify your email or use OTP."));
+        return ResponseEntity.ok(ApiResponse.success(user, "User registered successfully. You can now sign in."));
     }
 
     @PostMapping("/login")

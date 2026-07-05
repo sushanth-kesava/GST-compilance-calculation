@@ -55,11 +55,6 @@ public class AuthService {
             roles.addAll(request.getRoles());
         }
 
-        // Generate tokens
-        String verificationToken = UUID.randomUUID().toString();
-        String otp = String.format("%06d", new Random().nextInt(999999));
-        Instant otpExpiry = Instant.now().plusSeconds(600); // 10 minutes
-
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -67,21 +62,10 @@ public class AuthService {
                 .fullName(request.getFullName())
                 .roles(roles)
                 .active(true)
-                .verified(false) // Needs verification
-                .verificationToken(verificationToken)
-                .otp(otp)
-                .otpExpiry(otpExpiry)
+                .verified(true) // Auto-verified, no OTP required
                 .build();
 
         User savedUser = userRepository.save(user);
-
-        // In a real system, send email here. We print to console.
-        System.out.println("====== EMAIL SIMULATION ======");
-        System.out.println("To: " + savedUser.getEmail());
-        System.out.println("Verification Token: " + verificationToken);
-        System.out.println("OTP Code: " + otp);
-        System.out.println("==============================");
-
         return savedUser;
     }
 
@@ -213,8 +197,9 @@ public class AuthService {
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new CustomException("User not found from refresh token", HttpStatus.BAD_REQUEST));
 
-            // Generate fresh token
-            String newAccessToken = tokenProvider.generateRefreshToken(username); // simplified token utility reuse
+            // Generate fresh access token using the stored user
+            String newAccessToken = tokenProvider.generateTokenFromUsername(username, user.getId(), user.getRoles());
+            String newRefreshToken = tokenProvider.generateRefreshToken(username);
 
             List<String> roles = user.getRoles().stream()
                     .map(Role::name)
@@ -222,7 +207,7 @@ public class AuthService {
 
             return AuthResponse.builder()
                     .accessToken(newAccessToken)
-                    .refreshToken(refreshToken)
+                    .refreshToken(newRefreshToken)
                     .userId(user.getId())
                     .username(user.getUsername())
                     .email(user.getEmail())

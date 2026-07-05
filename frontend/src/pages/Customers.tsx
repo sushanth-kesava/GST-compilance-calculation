@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { Plus, Wallet, Sparkles, UserCheck } from 'lucide-react';
+import { useToast } from '../components/Toast';
 
 interface Customer {
   id?: string;
@@ -24,6 +25,8 @@ const Customers: React.FC = () => {
   const [activeCustId, setActiveCustId] = useState('');
   const [depositAmount, setDepositAmount] = useState('500');
 
+  const { toast } = useToast();
+
   // Customer Form states
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -38,7 +41,7 @@ const Customers: React.FC = () => {
         setCustomers(res.data);
       }
     } catch (err) {
-      console.error(err);
+      toast('error', 'Failed to load customers.');
     }
   };
 
@@ -54,7 +57,7 @@ const Customers: React.FC = () => {
       setShowModal(false);
       fetchCustomers();
     } catch (err: any) {
-      alert(err.message || 'Error creating profile');
+      toast('error', err.message || 'Error creating profile');
     }
   };
 
@@ -65,7 +68,7 @@ const Customers: React.FC = () => {
       setShowWalletModal(false);
       fetchCustomers();
     } catch (err) {
-      alert('Wallet deposit failed');
+      toast('error', 'Wallet deposit failed');
     }
   };
 

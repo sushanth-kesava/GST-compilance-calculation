@@ -8,6 +8,13 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Polyfills for packages expecting Node-like globals in browser
+      window.global = window;
+      if (!window.process) {
+        window.process = { env: {} };
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { ToastProvider } from './components/Toast';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import ERPGuide from './components/ERPGuide';
@@ -13,6 +14,7 @@ import Customers from './pages/Customers';
 import Suppliers from './pages/Suppliers';
 import AIAnalytics from './pages/AIAnalytics';
 import Settings from './pages/Settings';
+import Invoices from './pages/Invoices';
 
 // Authentication Guard Layout
 const ProtectedLayout: React.FC = () => {
@@ -41,6 +43,7 @@ const ProtectedLayout: React.FC = () => {
             <Route path="/" element={<Dashboard />} />
             <Route path="/pos" element={<POS />} />
             <Route path="/inventory" element={<Inventory />} />
+            <Route path="/invoices" element={<Invoices />} />
             <Route path="/customers" element={<Customers />} />
             <Route path="/suppliers" element={<Suppliers />} />
             <Route path="/ai-panel" element={<AIAnalytics />} />
@@ -58,12 +61,14 @@ const App: React.FC = () => {
   return (
     <ThemeProvider>
       <AuthProvider>
+        <ToastProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/*" element={<ProtectedLayout />} />
           </Routes>
         </BrowserRouter>
+        </ToastProvider>
       </AuthProvider>
     </ThemeProvider>
   );
